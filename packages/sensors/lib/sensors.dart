@@ -114,8 +114,7 @@ class UserAccelerometerEvent {
   final double z;
 
   /// The time in milliseconds at which the event happened.
-  /// For Android, the timestamp is the amount of time in milliseconds since the device booted.
-  /// For iOS, the timestamp is the amount of time in milliseconds since 1970.
+  /// The timestamp is the amount of time in milliseconds since the device booted.
   final double timestamp;
 
   @override
