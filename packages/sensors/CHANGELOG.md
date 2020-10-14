@@ -2,6 +2,7 @@
 ## 0.4.3
 
 * Added option to specify sample rate.
+* Added timestamp to sensor events.
 
 ## 0.4.2+4
 
