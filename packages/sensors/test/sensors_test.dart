@@ -16,7 +16,7 @@ void main() {
   test('$accelerometerEvents are streamed', () async {
     setSensorsSampleRate(50);
     const String channelName = 'plugins.flutter.io/sensors/accelerometer';
-    const List<double> sensorData = <double>[1.0, 2.0, 3.0];
+    const List<double> sensorData = <double>[1.0, 2.0, 3.0, 4.0];
     _initializeFakeSensorChannel(channelName, sensorData);
 
     final AccelerometerEvent event = await accelerometerEvents.first;
@@ -24,25 +24,27 @@ void main() {
     expect(event.x, sensorData[0]);
     expect(event.y, sensorData[1]);
     expect(event.z, sensorData[2]);
+    expect(event.timestamp, sensorData[3]);
   });
 
   test('$gyroscopeEvents are streamed', () async {
     setSensorsSampleRate(50);
     const String channelName = 'plugins.flutter.io/sensors/gyroscope';
-    const List<double> sensorData = <double>[3.0, 4.0, 5.0];
+    const List<double> sensorData = <double>[5.0, 6.0, 7.0, 8.0];
     _initializeFakeSensorChannel(channelName, sensorData);
 
     final GyroscopeEvent event = await gyroscopeEvents.first;
 
     expect(event.x, sensorData[0]);
     expect(event.y, sensorData[1]);
-    expect(event.z, sensorData[2]);
+    expect(event.z, sensorData[2]);    
+    expect(event.timestamp, sensorData[3]);
   });
 
   test('$userAccelerometerEvents are streamed', () async {
     setSensorsSampleRate(50);
     const String channelName = 'plugins.flutter.io/sensors/user_accel';
-    const List<double> sensorData = <double>[6.0, 7.0, 8.0];
+    const List<double> sensorData = <double>[9.0, 10.0, 11.0, 12.0];
     _initializeFakeSensorChannel(channelName, sensorData);
 
     final UserAccelerometerEvent event = await userAccelerometerEvents.first;
@@ -50,6 +52,7 @@ void main() {
     expect(event.x, sensorData[0]);
     expect(event.y, sensorData[1]);
     expect(event.z, sensorData[2]);
+    expect(event.timestamp, sensorData[3]);
   });
 }
 
