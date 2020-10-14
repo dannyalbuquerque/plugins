@@ -105,7 +105,6 @@ static void sendQuadruplet(Float64 x, Float64 y, Float64 z, Float64 timestamp, F
       startGyroUpdatesToQueue:[[NSOperationQueue alloc] init]
                   withHandler:^(CMGyroData* gyroData, NSError* error) {
                     CMRotationRate rotationRate = gyroData.rotationRate;
-                    NSTimeInterval timeInSeconds = [[NSDate date] timeIntervalSince1970];
                     sendQuadruplet(rotationRate.x, rotationRate.y, rotationRate.z, gyroData.timestamp*1000, eventSink);
                   }];
   return nil;
