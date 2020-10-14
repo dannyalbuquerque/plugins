@@ -61,7 +61,7 @@ static void sendQuadruplet(Float64 x, Float64 y, Float64 z, Float64 timestamp, F
                              // Multiply by gravity, and adjust sign values to
                              // align with Android.
                              sendQuadruplet(-acceleration.x * GRAVITY, -acceleration.y * GRAVITY,
-                                         -acceleration.z * GRAVITY, acceleration.timestamp*1000, eventSink);
+                                         -acceleration.z * GRAVITY, accelerometerData.timestamp*1000, eventSink);
                            }];
   return nil;
 }
@@ -84,7 +84,7 @@ static void sendQuadruplet(Float64 x, Float64 y, Float64 z, Float64 timestamp, F
                             CMAcceleration acceleration = data.userAcceleration;
                             // Multiply by gravity, and adjust sign values to align with Android.
                             sendQuadruplet(-acceleration.x * GRAVITY, -acceleration.y * GRAVITY,
-                                        -acceleration.z * GRAVITY, acceleration.timestamp*1000, eventSink);
+                                        -acceleration.z * GRAVITY, data.timestamp*1000, eventSink);
                           }];
   return nil;
 }
@@ -106,7 +106,7 @@ static void sendQuadruplet(Float64 x, Float64 y, Float64 z, Float64 timestamp, F
                   withHandler:^(CMGyroData* gyroData, NSError* error) {
                     CMRotationRate rotationRate = gyroData.rotationRate;
                     NSTimeInterval timeInSeconds = [[NSDate date] timeIntervalSince1970];
-                    sendQuadruplet(rotationRate.x, rotationRate.y, rotationRate.z, timeInSeconds*1000, eventSink);
+                    sendQuadruplet(rotationRate.x, rotationRate.y, rotationRate.z, gyroData.timestamp*1000, eventSink);
                   }];
   return nil;
 }
