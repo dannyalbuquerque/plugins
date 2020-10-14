@@ -19,8 +19,8 @@ const EventChannel _gyroscopeEventChannel =
 /// simply, you can use accelerometer readings to tell if the device is moving in
 /// a particular direction.
 class AccelerometerEvent {
-  /// Contructs an instance with the given [x], [y], and [z] values.
-  AccelerometerEvent(this.x, this.y, this.z);
+  /// Contructs an instance with the given [x], [y], [z] and [timestamp] values.
+  AccelerometerEvent(this.x, this.y, this.z, this.timestamp);
 
   /// Acceleration force along the x axis (including gravity) measured in m/s^2.
   ///
@@ -42,15 +42,19 @@ class AccelerometerEvent {
   /// towards the user and negative mean it is moving away from them.
   final double z;
 
+  /// The time in milliseconds at which the event happened.
+  /// The timestamp is the amount of time in milliseconds since the device booted.
+  final double timestamp;
+
   @override
-  String toString() => '[AccelerometerEvent (x: $x, y: $y, z: $z)]';
+  String toString() => '[AccelerometerEvent (x: $x, y: $y, z: $z) @ $timestamp]';
 }
 
 /// Discrete reading from a gyroscope. Gyroscopes measure the rate or rotation of
 /// the device in 3D space.
 class GyroscopeEvent {
-  /// Contructs an instance with the given [x], [y], and [z] values.
-  GyroscopeEvent(this.x, this.y, this.z);
+  /// Contructs an instance with the given [x], [y], [z] and [timestamp] values.
+  GyroscopeEvent(this.x, this.y, this.z, this.timestamp);
 
   /// Rate of rotation around the x axis measured in rad/s.
   ///
@@ -74,16 +78,20 @@ class GyroscopeEvent {
   /// on.
   final double z;
 
+  /// The time in milliseconds at which the event happened.
+  /// The timestamp is the amount of time in milliseconds since the device booted.
+  final double timestamp;
+
   @override
-  String toString() => '[GyroscopeEvent (x: $x, y: $y, z: $z)]';
+  String toString() => '[GyroscopeEvent (x: $x, y: $y, z: $z) @ $timestamp]';
 }
 
 /// Like [AccelerometerEvent], this is a discrete reading from an accelerometer
 /// and measures the velocity of the device. However, unlike
 /// [AccelerometerEvent], this event does not include the effects of gravity.
 class UserAccelerometerEvent {
-  /// Contructs an instance with the given [x], [y], and [z] values.
-  UserAccelerometerEvent(this.x, this.y, this.z);
+  /// Contructs an instance with the given [x], [y], [z] and [timestamp] values.
+  UserAccelerometerEvent(this.x, this.y, this.z, this.timestamp);
 
   /// Acceleration force along the x axis (excluding gravity) measured in m/s^2.
   ///
@@ -105,31 +113,44 @@ class UserAccelerometerEvent {
   /// towards the user and negative mean it is moving away from them.
   final double z;
 
+  /// The time in milliseconds at which the event happened.
+  /// For Android, the timestamp is the amount of time in milliseconds since the device booted.
+  /// For iOS, the timestamp is the amount of time in milliseconds since 1970.
+  final double timestamp;
+
   @override
-  String toString() => '[UserAccelerometerEvent (x: $x, y: $y, z: $z)]';
+  String toString() => '[UserAccelerometerEvent (x: $x, y: $y, z: $z) @ $timestamp]';
 }
 
 AccelerometerEvent _listToAccelerometerEvent(List<double> list) {
-  return AccelerometerEvent(list[0], list[1], list[2]);
+  return AccelerometerEvent(list[0], list[1], list[2], list[3]);
 }
 
 UserAccelerometerEvent _listToUserAccelerometerEvent(List<double> list) {
-  return UserAccelerometerEvent(list[0], list[1], list[2]);
+  return UserAccelerometerEvent(list[0], list[1], list[2], list[3]);
 }
 
 GyroscopeEvent _listToGyroscopeEvent(List<double> list) {
-  return GyroscopeEvent(list[0], list[1], list[2]);
+  return GyroscopeEvent(list[0], list[1], list[2], list[3]);
 }
 
 Stream<AccelerometerEvent> _accelerometerEvents;
 Stream<GyroscopeEvent> _gyroscopeEvents;
 Stream<UserAccelerometerEvent> _userAccelerometerEvents;
 
+final int _sampleRateDefault = 15;
+int _sampleRate;
+
+/// Set the specified sample rate if it is greater than zero.
+void setSensorsSampleRate(int sampleRate) {
+  _sampleRate = (sampleRate > 0) ? sampleRate : _sampleRate;
+}
+
 /// A broadcast stream of events from the device accelerometer.
 Stream<AccelerometerEvent> get accelerometerEvents {
   if (_accelerometerEvents == null) {
     _accelerometerEvents = _accelerometerEventChannel
-        .receiveBroadcastStream()
+        .receiveBroadcastStream(_sampleRate ?? _sampleRateDefault)
         .map(
             (dynamic event) => _listToAccelerometerEvent(event.cast<double>()));
   }
@@ -140,7 +161,7 @@ Stream<AccelerometerEvent> get accelerometerEvents {
 Stream<GyroscopeEvent> get gyroscopeEvents {
   if (_gyroscopeEvents == null) {
     _gyroscopeEvents = _gyroscopeEventChannel
-        .receiveBroadcastStream()
+        .receiveBroadcastStream(_sampleRate ?? _sampleRateDefault)
         .map((dynamic event) => _listToGyroscopeEvent(event.cast<double>()));
   }
   return _gyroscopeEvents;
@@ -150,7 +171,7 @@ Stream<GyroscopeEvent> get gyroscopeEvents {
 Stream<UserAccelerometerEvent> get userAccelerometerEvents {
   if (_userAccelerometerEvents == null) {
     _userAccelerometerEvents = _userAccelerometerEventChannel
-        .receiveBroadcastStream()
+        .receiveBroadcastStream(_sampleRate ?? _sampleRateDefault)
         .map((dynamic event) =>
             _listToUserAccelerometerEvent(event.cast<double>()));
   }
